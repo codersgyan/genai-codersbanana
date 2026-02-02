@@ -7,12 +7,39 @@ import { LeftSidebar } from "@/components/left-sidebar";
 import ImageGenerationLoading from "@/components/image-generation";
 import { AIPromptInput } from "@/components/prompt-input";
 import { RightSidebar } from "@/components/right-sidebar";
+import { useRef, useState } from "react";
+import { useEditorStore } from "@/store/useEditorState";
 
 export default function Home() {
-  const imageSelected = false;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { image, setImage } = useEditorStore();
+  // const [image, setImage] = useState("");
+
+  const handleImageUpload = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const result = reader.result;
+      setImage(result as string);
+    };
+
+    reader.readAsDataURL(file as File);
+  };
+
   return (
     <>
       <div className="w-full h-dvh flex flex-col overflow-hidden">
+        <input
+          ref={fileInputRef}
+          onChange={handleImageUpload}
+          type="file"
+          accept="image/*"
+          className="hidden"
+        />
+
         <Navbar />
         <div className="flex-1 flex min-h-0 overflow-hidden">
           {/* LEFT COLUMN */}
@@ -26,14 +53,14 @@ export default function Home() {
               <div
                 className="absolute inset-0 opacity-[0.05]"
                 style={{
-                  backgroundImage: "radial-gradient(#fff 1px, transparent 1px)",
+                  backgroundImage:
+                    "radial-gradient(#fff 1px, transparent 1px)",
                   backgroundSize: "20px 20px",
-                }}
-              ></div>
+                }}></div>
 
               {/* MAIN EDITOR SCREEN */}
               <div className="w-full h-full flex items-center justify-center p-6 md:p-10">
-                {!imageSelected ? (
+                {!image ? (
                   <div className="text-center space-y-6 max-w-sm z-10 ">
                     <div className="w-24 h-24 bg-zinc-900/50 rounded-3xl border border-zinc-800 flex items-center justify-center mx-auto shadow-2xl shadow-yellow-900/10">
                       <Image
@@ -49,7 +76,8 @@ export default function Home() {
                         Start Creating
                       </h3>
                       <p className="text-zinc-500 text-sm mt-3 leading-relaxed">
-                        Upload an image to unlock the full potential of{" "}
+                        Upload an image to unlock the full
+                        potential of{" "}
                         <span className="text-yellow-500 font-medium">
                           Coder&apos;s Banana
                         </span>{" "}
@@ -57,15 +85,21 @@ export default function Home() {
                       </p>
                     </div>
                     <Button
-                      onClick={() => {}}
-                      className="w-full h-11 bg-yellow-500 hover:bg-yellow-400 text-zinc-950 font-bold rounded-xl transition-all hover:scale-[1.02]"
-                    >
+                      onClick={() => {
+                        fileInputRef.current?.click();
+                      }}
+                      className="w-full h-11 bg-yellow-500 hover:bg-yellow-400 text-zinc-950 font-bold rounded-xl transition-all hover:scale-[1.02]">
                       Select Image
                     </Button>
                   </div>
                 ) : (
                   <div className="relative w-full h-full flex items-center justify-center">
-                    IMAGE EDITOR COMPONENT
+                    <Image
+                      width="500"
+                      height="500"
+                      src={image}
+                      alt=""
+                    />
                   </div>
                 )}
               </div>
@@ -79,7 +113,6 @@ export default function Home() {
               <AIPromptInput />
             </div>
           </main>
-
 
           {/* RIGHT COLUMNS EDIT HISTORY */}
           <RightSidebar />
