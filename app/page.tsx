@@ -12,7 +12,7 @@ import { useEditorStore } from "@/store/useEditorState";
 
 export default function Home() {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { image, setImage } = useEditorStore();
+  const { image, setImage, showHistory } = useEditorStore();
   // const [image, setImage] = useState("");
 
   const handleImageUpload = (
@@ -115,7 +115,7 @@ export default function Home() {
           </main>
 
           {/* RIGHT COLUMNS EDIT HISTORY */}
-          <RightSidebar />
+          {showHistory && <RightSidebar />}
         </div>
       </div>
     </>

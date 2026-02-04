@@ -16,8 +16,14 @@ import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/store/useEditorState";
 
 export function Navbar() {
-  const { undo, redo, historyIndex, history } =
-    useEditorStore();
+  const {
+    undo,
+    redo,
+    historyIndex,
+    history,
+    showHistory,
+    toggleHistory,
+  } = useEditorStore();
 
   return (
     <header className="h-16 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between px-4 shrink-0 z-50">
@@ -96,11 +102,12 @@ export function Navbar() {
           <Button
             variant="ghost"
             size="icon"
+            onClick={toggleHistory}
             className={cn(
               "h-9 w-9 transition-all duration-200 bg-zinc-800 text-zinc-100 border border-zinc-700",
             )}
             title="Open History">
-            <History size={18} />
+            {showHistory ? <X /> : <History size={18} />}
           </Button>
         </div>
       </div>
