@@ -118,7 +118,8 @@ const PromptInputAttachmentsDisplay = () => {
 };
 
 export const AIPromptInput = () => {
-  const { setPrompt, generateEdit } = useEditorStore();
+  const { setPrompt, generateEdit, isLoading } =
+    useEditorStore();
 
   const [model, setModel] = useState<string>(models[0].id);
   const [modelSelectorOpen, setModelSelectorOpen] =
@@ -132,6 +133,8 @@ export const AIPromptInput = () => {
   );
 
   const handleSubmit = (message: PromptInputMessage) => {
+    if (isLoading) return;
+
     const hasText = Boolean(message.text);
     if (!hasText) return;
 

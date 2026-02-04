@@ -12,7 +12,8 @@ import { useEditorStore } from "@/store/useEditorState";
 
 export default function Home() {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { image, setImage, showHistory } = useEditorStore();
+  const { image, setImage, showHistory, isLoading } =
+    useEditorStore();
   // const [image, setImage] = useState("");
 
   const handleImageUpload = (
@@ -105,7 +106,7 @@ export default function Home() {
               </div>
 
               {/* render when image in generating */}
-              {/* <ImageGenerationLoading /> */}
+              {isLoading && <ImageGenerationLoading />}
             </div>
 
             {/* PROMPT INPUT AREA */}
