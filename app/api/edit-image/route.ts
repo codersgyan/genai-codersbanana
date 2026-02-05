@@ -14,7 +14,8 @@ function cleanBase64Image(dataUrl: string): string {
 }
 
 export async function POST(request: Request) {
-  const { imageBase64, prompt } = await request.json();
+  const { imageBase64, prompt, userFiles } =
+    await request.json();
 
   const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY,
@@ -29,6 +30,31 @@ export async function POST(request: Request) {
       },
     },
   ];
+
+  if (
+    userFiles &&
+    Array.isArray(userFiles) &&
+    userFiles.length > 0
+  ) {
+    /**
+      {
+        filename: "saree-lady.jpg"
+        mediaType: "image/jpeg"
+        type: "file"
+        url: "data:image/jpeg;base64,/9j/4AA..."
+      }
+    */
+    const processedFiles = userFiles.map((file) => {
+      return {
+        inlineData: {
+          mimeType: getMimeType(file.url),
+          data: cleanBase64Image(file.url),
+        },
+      };
+    });
+
+    parts.push(...processedFiles)
+  }
 
   const response = await ai.models.generateContent({
     model: "gemini-3-pro-image-preview",

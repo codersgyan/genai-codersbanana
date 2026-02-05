@@ -118,8 +118,12 @@ const PromptInputAttachmentsDisplay = () => {
 };
 
 export const AIPromptInput = () => {
-  const { setPrompt, generateEdit, isLoading } =
-    useEditorStore();
+  const {
+    setPrompt,
+    generateEdit,
+    isLoading,
+    setUserFiles,
+  } = useEditorStore();
 
   const [model, setModel] = useState<string>(models[0].id);
   const [modelSelectorOpen, setModelSelectorOpen] =
@@ -136,18 +140,17 @@ export const AIPromptInput = () => {
     if (isLoading) return;
 
     const hasText = Boolean(message.text);
-    if (!hasText) return;
+    const hasAttachments = Boolean(message.files?.length);
 
-    // const hasAttachments = Boolean(message.files?.length);
-
-    // if (!(hasText || hasAttachments)) {
-    //   return;
-    // }
+    if (!(hasText || hasAttachments)) {
+      return;
+    }
 
     // setStatus("submitted");
     // store to global store
-    console.log("submit");
+
     setPrompt(message.text);
+    setUserFiles(message.files);
     generateEdit();
 
     // eslint-disable-next-line no-console

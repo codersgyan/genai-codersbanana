@@ -1,3 +1,4 @@
+import { FileUIPart } from "ai";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
@@ -8,6 +9,8 @@ type EditorState = {
   historyIndex: number;
   showHistory: boolean;
   isLoading: boolean;
+  userFiles: FileUIPart[];
+  setUserFiles: (files: FileUIPart[]) => void;
   setHistory: (history: string[]) => void;
   setHistoryIndex: (index: number) => void;
   undo: () => void;
@@ -27,6 +30,10 @@ export const useEditorStore = create<EditorState>()(
     historyIndex: 0,
     showHistory: false,
     isLoading: false,
+    userFiles: [],
+    setUserFiles: (files: FileUIPart[]) => {
+      set({ userFiles: files });
+    },
     setImage: (imageData: string) =>
       set(() => ({
         image: imageData,
@@ -88,6 +95,7 @@ export const useEditorStore = create<EditorState>()(
         body: JSON.stringify({
           imageBase64: state.image,
           prompt: state.prompt,
+          userFiles: state.userFiles,
         }),
       });
 
