@@ -20,6 +20,7 @@ type EditorState = {
   setImage: (ImageData: string) => void;
   setPrompt: (prompt: string) => void;
   generateEdit: () => Promise<void>;
+  applyFilter: (prompt: string) => void;
 };
 
 export const useEditorStore = create<EditorState>()(
@@ -106,6 +107,45 @@ export const useEditorStore = create<EditorState>()(
 
       const data = await response.json();
 
+      const clonedHistory = [...state.history, data.result];
+
+      set(() => ({
+        image: data.result,
+        history: clonedHistory,
+        historyIndex: state.history.length,
+        isLoading: false,
+      }));
+    },
+    applyFilter: async (prompt: string) => {
+      // prompt -> image -> send to model(server)
+      const state = get();
+
+      const finalPrompt = `
+        ${prompt}
+        TECHNICAL CONSTRAINTS:
+        1. STRICTLY PRESERVE COMPOSITION: Do not change the subject's pose, the camera angle, or the placement of objects.
+        2. OUTPUT FORMAT: This is a style transfer. Keep the underlying structure of the image identical to the original, only changing the texture, lighting, and colors to match the requested style.
+      `;
+
+      set({ isLoading: true });
+
+      const response = await fetch("/api/edit-image", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          imageBase64: state.image,
+          prompt: finalPrompt,
+        }),
+      });
+
+      if (!response.ok) {
+        set({ isLoading: false });
+        throw new Error("failed to generate.");
+      }
+
+      const data = await response.json();
       const clonedHistory = [...state.history, data.result];
 
       set(() => ({

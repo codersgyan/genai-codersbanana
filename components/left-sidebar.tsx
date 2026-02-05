@@ -24,8 +24,11 @@ import {
 import GridItem from "@/components/grid-item";
 import { filters, ratios } from "@/lib/constants";
 import { ToolButton } from "@/components//tool-button";
+import { useEditorStore } from "@/store/useEditorState";
 
 export const LeftSidebar = () => {
+  const { applyFilter, isLoading } = useEditorStore();
+
   return (
     <aside className="hidden md:flex w-80 flex-col border-r border-zinc-800 bg-zinc-950/50 z-20 shrink-0 h-full">
       <ScrollArea className="h-full w-full">
@@ -40,7 +43,7 @@ export const LeftSidebar = () => {
             <div className="grid grid-cols-4 gap-2">
               <ToolButton
                 active={true}
-                onClick={()=>{}}
+                onClick={() => {}}
                 icon={<Hand size={18} />}
                 label="Pan"
               />
@@ -52,13 +55,13 @@ export const LeftSidebar = () => {
               />
               <ToolButton
                 active={false}
-                onClick={()=>{}}
+                onClick={() => {}}
                 icon={<Brush size={18} />}
                 label="Brush"
               />
               <ToolButton
                 active={false}
-                onClick={()=>{}}
+                onClick={() => {}}
                 icon={<Eraser size={18} />}
                 label="Erase"
               />
@@ -81,8 +84,7 @@ export const LeftSidebar = () => {
                 max={100}
                 min={5}
                 step={1}
-                onValueChange={()=>{
-                }}
+                onValueChange={() => {}}
                 className="py-2 [&>.relative>.absolute]:bg-yellow-500 **:[[role=slider]]:border-yellow-500 **:[[role=slider]]:bg-zinc-950 **:[[role=slider]]:ring-offset-zinc-950 **:[[role=slider]]:focus-visible:ring-yellow-500"
               />
             </div>
@@ -102,14 +104,17 @@ export const LeftSidebar = () => {
               type="single"
               collapsible
               className="w-full"
-              defaultValue="options"
-            >
+              defaultValue="options">
               {/* Item 1: Editing Options */}
-              <AccordionItem value="options" className="border-zinc-800">
+              <AccordionItem
+                value="options"
+                className="border-zinc-800">
                 <AccordionTrigger className="text-zinc-200 hover:text-yellow-500 hover:no-underline py-3 transition-colors">
                   <div className="flex items-center gap-2">
                     <Sparkles size={16} />
-                    <span className="text-sm">AI Editing Options</span>
+                    <span className="text-sm">
+                      AI Editing Options
+                    </span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="pt-2 pb-4 space-y-2">
@@ -118,9 +123,7 @@ export const LeftSidebar = () => {
                       icon={Delete}
                       label={"Remove Background"}
                       // desc={"clear background"}
-                      onClick={()=>{
-
-                      }}
+                      onClick={() => {}}
                       disabled={true}
                     />
                     <GridItem
@@ -135,11 +138,15 @@ export const LeftSidebar = () => {
               </AccordionItem>
 
               {/* Item 2: AI Filters */}
-              <AccordionItem value="filters" className="border-zinc-800">
+              <AccordionItem
+                value="filters"
+                className="border-zinc-800">
                 <AccordionTrigger className="text-zinc-200 hover:text-yellow-500 hover:no-underline py-3 transition-colors">
                   <div className="flex items-center gap-2">
                     <ImageIcon size={16} />
-                    <span className="text-sm">AI Filters</span>
+                    <span className="text-sm">
+                      AI Filters
+                    </span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="pt-2 pb-4">
@@ -152,9 +159,9 @@ export const LeftSidebar = () => {
                           label={item.name}
                           desc={item.prompt}
                           onClick={() => {
-                            
+                            applyFilter(item.prompt);
                           }}
-                          disabled={true}
+                          disabled={isLoading}
                         />
                       );
                     })}
@@ -163,11 +170,15 @@ export const LeftSidebar = () => {
               </AccordionItem>
 
               {/* Item 3: AI Expansion */}
-              <AccordionItem value="expansion" className="border-none">
+              <AccordionItem
+                value="expansion"
+                className="border-none">
                 <AccordionTrigger className="text-zinc-200 hover:text-yellow-500 hover:no-underline py-3 transition-colors">
                   <div className="flex items-center gap-2">
                     <Maximize size={16} />
-                    <span className="text-sm">AI Expansion</span>
+                    <span className="text-sm">
+                      AI Expansion
+                    </span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="pt-2 pb-4">
@@ -178,9 +189,7 @@ export const LeftSidebar = () => {
                         icon={r.icon}
                         label={r.label}
                         desc={r.desc}
-                        onClick={() => {
-
-                        }}
+                        onClick={() => {}}
                         disabled={true}
                       />
                     ))}
