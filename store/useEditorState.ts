@@ -21,6 +21,7 @@ type EditorState = {
   setPrompt: (prompt: string) => void;
   generateEdit: () => Promise<void>;
   applyFilter: (prompt: string) => void;
+  applyExpansion: (aspectRatio: string) => void;
 };
 
 export const useEditorStore = create<EditorState>()(
@@ -137,6 +138,52 @@ export const useEditorStore = create<EditorState>()(
         body: JSON.stringify({
           imageBase64: state.image,
           prompt: finalPrompt,
+        }),
+      });
+
+      if (!response.ok) {
+        set({ isLoading: false });
+        throw new Error("failed to generate.");
+      }
+
+      const data = await response.json();
+      const clonedHistory = [...state.history, data.result];
+
+      set(() => ({
+        image: data.result,
+        history: clonedHistory,
+        historyIndex: state.history.length,
+        isLoading: false,
+      }));
+    },
+    applyExpansion: async (aspectRatio: string) => {
+      const state = get();
+      if (!state.image) return;
+
+      const baseInstruction = `High-fidelity outpainting. Analyze the visual context of the original image and seamlessly extend the scenery into the empty areas. Ensure the person's face and features remain completely unchanged`;
+
+      const technicalConstraint = `Strictly maintain the continuity of existing lines, horizon, textures, lighting, and perspective. The transition must be invisible. Do not alter the style or content of the original center image `;
+
+      const userContext = state.prompt
+        ? `Addtional context/subject for extension: ${state.prompt}`
+        : "";
+
+      const finalPrompt = `
+        ${baseInstruction}
+        ${technicalConstraint}
+        ${userContext}`;
+
+      set({ isLoading: true });
+
+      const response = await fetch("/api/edit-image", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          imageBase64: state.image,
+          prompt: finalPrompt,
+          aspectRatio: aspectRatio,
         }),
       });
 
