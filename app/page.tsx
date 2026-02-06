@@ -9,6 +9,7 @@ import { AIPromptInput } from "@/components/prompt-input";
 import { RightSidebar } from "@/components/right-sidebar";
 import { useRef, useState } from "react";
 import { useEditorStore } from "@/store/useEditorState";
+import ImageEditor from "@/components/image-editor";
 
 export default function Home() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -95,12 +96,7 @@ export default function Home() {
                   </div>
                 ) : (
                   <div className="relative w-full h-full flex items-center justify-center">
-                    <Image
-                      width="500"
-                      height="500"
-                      src={image}
-                      alt=""
-                    />
+                    <ImageEditor />
                   </div>
                 )}
               </div>
