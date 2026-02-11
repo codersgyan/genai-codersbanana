@@ -1,9 +1,7 @@
 import { ToolType } from "@/lib/constants";
 import { useEditorStore } from "@/store/useEditorState";
 import { Point } from "@/types";
-import NextImage from "next/image";
 import { useCallback, useEffect, useRef } from "react";
-import { start } from "repl";
 
 const MASK_WHITE_THRESHOLD = 10;
 
@@ -184,7 +182,12 @@ const ImageEditor = () => {
   };
 
   const drawMove = (e: React.PointerEvent) => {
-    if (!isDrawingRef.current) return;
+    if (
+      !isDrawingRef.current ||
+      !canvasRef.current ||
+      !startPosRef.current
+    )
+      return;
 
     const startPos = startPosRef.current;
     if (!startPos) return;
@@ -199,15 +202,46 @@ const ImageEditor = () => {
     ) {
       updateMask(startPos, currentPos);
       startPosRef.current = currentPos;
-    }
 
-    draw();
+      draw();
+    } else if (selectedTool === ToolType.RECTANGLE) {
+      draw();
+      const ctx = canvasRef.current.getContext("2d");
+      if (ctx) {
+        ctx.save();
+
+        const w = currentPos.x - startPos.x;
+        const h = currentPos.y - startPos.y;
+
+        ctx.fillStyle = "rgba(255, 0, 0, 0.4)";
+        ctx.fillRect(startPos.x, startPos.y, w, h);
+
+        ctx.restore();
+      }
+    }
   };
 
-  const endDrawing = () => {
+  const endDrawing = (e: React.PointerEvent) => {
     isDrawingRef.current = false;
 
-    // todo: prepare the mask to be base 64 (dataurl)
+    if (selectedTool === ToolType.RECTANGLE) {
+      const endPos = getPointerPos(e);
+      const startPos = startPosRef.current;
+      if (!startPos) return;
+
+      const ctx = maskCanvasRef.current?.getContext("2d");
+      if (ctx) {
+        ctx.fillStyle = "white";
+
+        const w = endPos.x - startPos.x;
+        const h = endPos.y - startPos.y;
+
+        if (Math.abs(w) > 0 && Math.abs(h) > 0) {
+          ctx.fillRect(startPos.x, startPos.y, w, h);
+        }
+      }
+    }
+
     if (maskCanvasRef.current) {
       const dataUrl =
         maskCanvasRef.current?.toDataURL("image/png");
